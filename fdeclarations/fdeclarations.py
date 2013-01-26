@@ -95,7 +95,7 @@ class FortranVariable:
            string += ", dimension" + self.dim
         string += " :: " + self.name
         if self.initialiser:
-           string += " = " + self.initialiser
+           string += " =" + self.initialiser
         return string
 
 # TODO
