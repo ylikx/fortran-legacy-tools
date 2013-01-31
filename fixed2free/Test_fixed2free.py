@@ -52,6 +52,13 @@ c
 """,
 """
 Csho
+""",
+"""
+C An empty line and an ! continuation character
+      X = SIN(A) * COS(B) +
+
+     & SIN(B) * COS(A) +
+     ! X
 """
 ]
 
@@ -101,39 +108,38 @@ WRITE(*,*) "Regular line."
 """,
 """
 !sho
+""",
+"""
+! An empty line and an ! continuation character
+X = SIN(A) * COS(B) + &
+
+ SIN(B) * COS(A) + &
+ X
 """
 ]
 
-class Test_fixed2free(unittest.TestCase):
+class Test_CompareStr(unittest.TestCase):
 
     def streamComp(self, stream1, stream2):
         for s1, s2 in zip(stream1, stream2):
             self.assertEqual(s1, s2)
 
-    def dotest(self,test, sol):
-        instream = StringIO(test)
-        outstream = StringIO(sol)
-        self.streamComp(outstream, convertToFree(instream))
-        instream.close
-        outstream.close
+def dotest(self, instr, solution):
+    instream = StringIO(instr)
+    outstream = StringIO(solution)
+    self.streamComp(outstream, convertToFree(instream))
+    instream.close()
+    outstream.close()
 
-    def test_00(self):
-        self.dotest(teststr[0], solutions[0])
-    def test_01(self):
-        self.dotest(teststr[1], solutions[1])
-    def test_02(self):
-        self.dotest(teststr[2], solutions[2])
-    def test_03(self):
-        self.dotest(teststr[3], solutions[3])
-    def test_04(self):
-        self.dotest(teststr[4], solutions[4])
-    def test_05(self):
-        self.dotest(teststr[5], solutions[5])
-    def test_06(self):
-        self.dotest(teststr[6], solutions[6])   
-    def test_07(self):
-        self.dotest(teststr[7], solutions[7])
-    def test_08(self):
-        self.dotest(teststr[8], solutions[8])      
+def makeTest(instr, solution):
+    return lambda self: dotest(self, instr, solution)
+   
 if __name__ == "__main__":
+    num = 0
+    for instr, solution in zip(teststr, solutions):
+        testfun = makeTest(instr, solution)
+        testfun.__name__ = "test_" + str(num)
+        setattr(Test_CompareStr, testfun.__name__, testfun)
+        num += 1
     unittest.main()
+
