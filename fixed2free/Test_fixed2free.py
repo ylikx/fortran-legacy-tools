@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import unittest
@@ -106,12 +107,8 @@ WRITE(*,*) "Regular line."
 class Test_fixed2free(unittest.TestCase):
 
     def streamComp(self, stream1, stream2):
-        string1 = ''
-        string2 = ''
         for s1, s2 in zip(stream1, stream2):
-            string1 = string1 + s1
-            string2 = string2 + s2
-        self.assertEqual(string1, string2)
+            self.assertEqual(s1, s2)
 
     def dotest(self,test, sol):
         instream = StringIO(test)

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # fixed2free.py: Conversion of Fortran code from fixed to free
@@ -22,7 +23,7 @@
 Script that converts fixed form Fortran code to free form
 Usage: file name as first command line parameter
 
-python fixed2free.py file.f > file.f90
+python fixed2free2.py file.f > file.f90
 """
 
 # author: Elias Rabel, 2012
@@ -31,9 +32,9 @@ python fixed2free.py file.f > file.f90
 # https://www.github.com/ylikx/
 
 # TODO:
-# *) Does not handle multi-line strings
-# *) problems with comments between continued lines - could be easily fixed
 # *) Improve command line usage
+
+import sys
 
 class FortranLine:
     def __init__(self, line):
@@ -47,6 +48,7 @@ class FortranLine:
         return self.line_conv
         
     def continueLine(self):
+        """Insert line continuation symbol at end of line."""
         self.line_conv = self.line_conv.rstrip() + " &\n"
         
     def __analyse(self):
@@ -60,54 +62,52 @@ class FortranLine:
         self.isEmpty = len(line) == 0
         self.isComment = firstchar in "cC*!"
         self.isNewComment = '!' in fivechars and not self.isComment
-        self.isOMP = self.isComment and "$omp" == self.label
+        self.isOMP = self.isComment and "$omp" in self.label
         if self.isOMP:
             self.isComment = False
             self.label = ''
-        self.isCppLine = (firstchar == '#')        
-        self.isContinuation = (not (cont_char.isspace() or cont_char == '0') and 
-                              (not self.isComment and not self.isNewComment or self.isOMP) 
-                               and not self.isCppLine)
+        self.isCppLine = (firstchar == '#')
+        self.is_regular = (not (self.isComment or self.isNewComment or 
+                           self.isCppLine or self.isShort))      
+        self.isContinuation = (not (cont_char.isspace() or cont_char == '0') and
+                               self.is_regular)
 
         # convert
         self.code = line[6:] if len(line) > 6 else '\n'
         
         if self.isComment:
-            #self.line_conv = '!' + gap + cont_char + self.code
             self.line_conv = '!' + line[1:]
         elif self.isNewComment or self.isCppLine:
             self.line_conv = line
         elif self.isOMP:
-            self.line_conv = '!' + line[1:5] + ' ' + self.code #TODO
+            self.line_conv = '!' + line[1:5] + ' ' + self.code
         elif not self.label.isspace():
             self.line_conv = self.label + self.code
         else:
             self.line_conv = self.code
-            
-        #if self.isContinuation:
-        #    self.line_conv = self.code + self.excessLine
-            
+
 
 def convertToFree(stream):
+    """Convert stream from fixed source form to free source form."""
     linestack = []
         
     for line in stream:
         convline = FortranLine(line)
         
-        if not convline.isComment and not convline.isNewComment:
+        if convline.is_regular:
             if convline.isContinuation and linestack: 
-                linestack[0].continueLine()         
-            for l in linestack: yield str(l)
+                linestack[0].continueLine()
+            for l in linestack:
+                yield str(l)
             linestack = []
             
         linestack.append(convline)
         
-    for l in linestack: yield str(l)
+    for l in linestack:
+        yield str(l)
         
 
 if __name__ == "__main__":
-
-    import sys
 
     infile = open(sys.argv[1], 'r')
     for line in convertToFree(infile):
