@@ -59,6 +59,9 @@ C An empty line and an ! continuation character
 
      & SIN(B) * COS(A) +
      ! X
+""",
+"""
+10    CONTINUE
 """
 ]
 
@@ -115,6 +118,9 @@ X = SIN(A) * COS(B) + &
 
  SIN(B) * COS(A) + &
  X
+""",
+"""
+10 CONTINUE
 """
 ]
 

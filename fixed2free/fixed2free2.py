@@ -54,7 +54,7 @@ class FortranLine:
     def __analyse(self):
         line = self.line
         firstchar = line[0] if len(line) > 0 else ''
-        self.label = line[1:5].strip().lower() + ' ' if len(line) > 1 else ''
+        self.label = line[0:5].strip().lower() + ' ' if len(line) > 1 else ''
         cont_char = line[5] if len(line) >= 6 else ''
         fivechars = line[1:5] if len(line) > 1 else ''
         self.isShort = (len(line) <= 6)
@@ -62,7 +62,7 @@ class FortranLine:
         self.isEmpty = len(line) == 0
         self.isComment = firstchar in "cC*!"
         self.isNewComment = '!' in fivechars and not self.isComment
-        self.isOMP = self.isComment and "$omp" in self.label
+        self.isOMP = self.isComment and fivechars.lower() == "$omp"
         if self.isOMP:
             self.isComment = False
             self.label = ''
