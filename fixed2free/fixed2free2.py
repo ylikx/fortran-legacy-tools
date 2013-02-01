@@ -49,8 +49,13 @@ class FortranLine:
         
     def continueLine(self):
         """Insert line continuation symbol at end of line."""
-        self.line_conv = self.line_conv.rstrip() + " &\n"
-        
+
+        if not (self.isLong and self.is_regular):
+            self.line_conv = self.line_conv.rstrip() + " &\n"
+        else:
+            temp = self.line_conv[:72].rstrip() + " &"
+            self.line_conv = temp.ljust(72) + self.excess_line
+                  
     def __analyse(self):
         line = self.line
         firstchar = line[0] if len(line) > 0 else ''
@@ -58,8 +63,8 @@ class FortranLine:
         cont_char = line[5] if len(line) >= 6 else ''
         fivechars = line[1:5] if len(line) > 1 else ''
         self.isShort = (len(line) <= 6)
+        self.isLong  = (len(line) > 73)
         
-        self.isEmpty = len(line) == 0
         self.isComment = firstchar in "cC*!"
         self.isNewComment = '!' in fivechars and not self.isComment
         self.isOMP = self.isComment and fivechars.lower() == "$omp"
@@ -71,6 +76,12 @@ class FortranLine:
                            self.isCppLine or self.isShort))      
         self.isContinuation = (not (cont_char.isspace() or cont_char == '0') and
                                self.is_regular)
+
+        if self.isLong and self.is_regular:
+            self.excess_line = '!' + line[72:]
+            line = line[:72] + '\n'
+        else:
+            self.excess_line = ''
 
         # convert
         self.code = line[6:] if len(line) > 6 else '\n'
@@ -85,6 +96,9 @@ class FortranLine:
             self.line_conv = self.label + self.code
         else:
             self.line_conv = self.code
+
+        if self.isLong and self.is_regular:
+            self.line_conv = self.line_conv.rstrip().ljust(72) + self.excess_line
 
 
 def convertToFree(stream):

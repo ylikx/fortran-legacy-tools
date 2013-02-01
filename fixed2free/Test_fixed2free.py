@@ -62,6 +62,14 @@ C An empty line and an ! continuation character
 """,
 """
 10    CONTINUE
+""",
+"""
+C Test with code that uses text after 72nd column as comments           ENDOFLINE
+      E = M * C**2                                                      COMMENT
+      CALL FUNC(A, B, C,                                                COMMENT
+     +          D, E, F,                                                THEEND
+C comment inbetween                                                     WHY
+     $          G, H, I)                                                SOMETHING
 """
 ]
 
@@ -121,6 +129,14 @@ X = SIN(A) * COS(B) + &
 """,
 """
 10 CONTINUE
+""",
+"""
+! Test with code that uses text after 72nd column as comments           ENDOFLINE
+E = M * C**2                                                            !COMMENT
+CALL FUNC(A, B, C, &                                                    !COMMENT
+          D, E, F, &                                                    !THEEND
+! comment inbetween                                                     WHY
+          G, H, I)                                                      !SOMETHING
 """
 ]
 
