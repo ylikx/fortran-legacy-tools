@@ -23,6 +23,8 @@ Some similar tools that I tried, attempt to automatically upgrade
 deprecated language constructs with varying success.
 This tool takes a more minimalistic approach and changes only the source form.
 
+Automatic unit tests are provided with the Test_fixed2free2.py file.
+
 -------------------------------------------------------------------------------
 flowercase/flowercase.py:
 -------------------------------------------------------------------------------
