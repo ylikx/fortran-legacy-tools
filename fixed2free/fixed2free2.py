@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# fixed2free.py: Conversion of Fortran code from fixed to free
-#                source form.
+# fixed2free2.py: Conversion of Fortran code from fixed to free
+#                 source form.
 #
 # Copyright (C) 2012    Elias Rabel
 #
@@ -27,7 +27,7 @@ python fixed2free2.py file.f > file.f90
 """
 
 # author: Elias Rabel, 2012
-# Let me know when you find this script useful:
+# Let me know if you find this script useful:
 # ylikx.0 at gmail
 # https://www.github.com/ylikx/
 
@@ -83,7 +83,11 @@ class FortranLine:
         else:
             self.excess_line = ''
 
-        # convert
+        self.line = line
+        self.__convert()
+
+    def __convert(self):
+        line = self.line
         self.code = line[6:] if len(line) > 6 else '\n'
         
         if self.isComment:
@@ -123,8 +127,11 @@ def convertToFree(stream):
 
 if __name__ == "__main__":
 
-    infile = open(sys.argv[1], 'r')
-    for line in convertToFree(infile):
-        print line,
+    if len(sys.argv) > 1:
+        infile = open(sys.argv[1], 'r')
+        for line in convertToFree(infile):
+            print line,
     
-    infile.close()
+        infile.close()
+    else:
+        print(__doc__)
