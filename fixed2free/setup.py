@@ -38,11 +38,11 @@ This tool takes a more minimalistic approach and changes only the source form.
                    'Natural Language :: English',
                    'Operating System :: OS Independent',
                    'Programming Language :: Python',
-                   'Programming Language :: Python :: 2.6'
+                   'Programming Language :: Python :: 2.6',
                    'Programming Language :: Fortran',
                    'Topic :: Software Development',
                    'Topic :: Software Development :: Code Generators',
-                   'Topic :: Scientific/Engineering']
+                   'Topic :: Scientific/Engineering',]
      )
 
 #TODO: download_url
