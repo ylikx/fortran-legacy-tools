@@ -45,6 +45,7 @@ for line in infile:
   line_new = ''
   word = ''
   commentmode = False
+  stringmode = False
 
   for character in line:
     if not character.isalnum() and character<>'_':
