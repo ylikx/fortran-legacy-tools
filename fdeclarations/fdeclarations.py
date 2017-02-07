@@ -60,11 +60,13 @@ https://www.github.com/ylikx/
 
 """
 
+from __future__ import print_function
+
 import re
 import sys
 
 TYPEKEYS = ['integer', 'logical', 'real', 'complex',
-            'double precision', 'double complex']
+            'double precision', 'double complex', 'character', 'doubleprecision', 'doublecomplex']
 
 #m = re.search(r'(subroutine|function)(.*?)\((.*?)\)', s)
 
@@ -98,7 +100,6 @@ class FortranVariable:
            string += " =" + self.initialiser
         return string
 
-# TODO
 class FortranSubroutineHeader:
     def __init__(name, arglist):
         self.name = ''
@@ -298,16 +299,16 @@ def printWrapperCode(subname, arglist, varlist):
     #for entry in arglist:
     #    print "!> @param        " + entry
     print("subroutine " + subname + "_wrapper(" + ','.join(arglist) + ')')
-    print
+    print()
     print("  implicit none")
-    print
+    print()
     # parameters first
     print( "  ! Parameters")
     for entry in varlist:
         if not entry.is_argument and entry.is_parameter:
             print ("  " + entry.getDeclString())
     # print scalar arguments
-    print
+    print()
     print( "  ! Arguments")
     for entry in varlist:
         if entry.is_argument:
@@ -318,15 +319,15 @@ def printWrapperCode(subname, arglist, varlist):
     #for entry in varlist:
     #    if entry.is_argument and entry.dim:
     #        print "  " + entry.getDeclString()
-    print
-    print "  ! Former local variables of " + subname
+    print()
+    print("  ! Former local variables of " + subname)
     for entry in varlist:
         if not entry.is_argument:
-            print "  ! " + entry.getDeclString()
+            print("  ! " + entry.getDeclString())
     
-    print
+    print()
     print ("  call " + subname + "(" + ','.join(arglist) + ')')
-    print
+    print()
     print("end subroutine")
 
 if __name__ == "__main__":
@@ -348,7 +349,7 @@ if __name__ == "__main__":
             break
 
     if not args:
-        print "ERROR: no subroutine header found!"
+        print("ERROR: no subroutine header found!")
         raise NoArgList
 
     vardict = {}

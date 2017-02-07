@@ -32,6 +32,8 @@ Usage: file name as first command line parameter
 # ylikx.0 at gmail
 # https://www.github.com/ylikx/
 
+from __future__ import print_function
+
 import sys
 
 infile = open(sys.argv[1], 'r')
@@ -48,7 +50,7 @@ for line in infile:
   stringmode = False
 
   for character in line:
-    if not character.isalnum() and character<>'_':
+    if not character.isalnum() and character != '_':
 
       if not stringmode and not commentmode:
         if word.isupper(): # means: do not convert mixed case words
@@ -71,6 +73,6 @@ for line in infile:
     else:
       word += character
 
-  print line_new,
+  print(line_new, end="")
 
 infile.close()
