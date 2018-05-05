@@ -72,6 +72,27 @@ C Test with code that uses text after 72nd column as comments           ENDOFLIN
      +          D, E, F,                                                THEEND
 C comment inbetween                                                     WHY
      $          G, H, I)                                                SOMETHING
+""",
+
+"""
+ 1000 E =  ! an inline comment in a continued line
+     +    2 * 3
+""",
+
+# do not rip apart inline comments
+"""
+      E = 42                        ! inline comment extending beyond column 72
+""",
+
+"""
+      E = 42  ! just a short inline comment
+""",
+
+"""
+      C = "!" //
+     &    '!' //                                                        ABC
+     &    "!'!" //
+     &    "A"
 """
 ]
 
@@ -139,6 +160,26 @@ CALL FUNC(A, B, C, &                                                    !COMMENT
           D, E, F, &                                                    !THEEND
 ! comment inbetween                                                     WHY
           G, H, I)                                                      !SOMETHING
+""",
+
+"""
+1000 E = & ! an inline comment in a continued line
+    2 * 3
+""",
+
+"""
+E = 42                        ! inline comment extending beyond column 72
+""",
+
+"""
+E = 42  ! just a short inline comment
+""",
+
+"""
+C = "!" // &
+    '!' // &                                                            !ABC
+    "!'!" // &
+    "A"
 """
 ]
 

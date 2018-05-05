@@ -49,13 +49,20 @@ class FortranLine:
         return self.line_conv
         
     def continueLine(self):
-        """Insert line continuation symbol at end of line."""
+        """Insert line continuation symbol at correct position in a free format line."""
 
-        if not (self.isLong and self.is_regular):
+        if not self.isOMP:
+            before_inline_comment, inline_comment = extract_inline_comment(self.line_conv)
+        else:
+            tmp, inline_comment = extract_inline_comment(self.line_conv[1:].lstrip())
+            before_inline_comment = "!" + tmp
+        
+        if inline_comment == "":
             self.line_conv = self.line_conv.rstrip() + " &\n"
         else:
-            temp = self.line_conv[:72].rstrip() + " &"
-            self.line_conv = temp.ljust(72) + self.excess_line
+            len_before = len(before_inline_comment)
+            before = before_inline_comment.rstrip() + " & "
+            self.line_conv = before.ljust(len_before) + inline_comment
                   
     def __analyse(self):
         line = self.line
@@ -78,19 +85,22 @@ class FortranLine:
         self.isContinuation = (not (cont_char.isspace() or cont_char == '0') and
                                self.is_regular)
 
-        if self.isLong and self.is_regular:
-            self.excess_line = '!' + line[72:]
-            line = line[:72] + '\n'
-        else:
-            self.excess_line = ''
+        self.code = line[6:] if len(line) > 6 else '\n'
 
+        self.excess_line = '' 
+        if self.isLong and self.is_regular:
+            _, inline_comment = extract_inline_comment(self.code)
+            if inline_comment == "":
+                self.excess_line = '!' + line[72:]
+                line = line[:72] + '\n'
+                self.code = line[6:]
+        
         self.line = line
         self.__convert()
 
     def __convert(self):
         line = self.line
-        self.code = line[6:] if len(line) > 6 else '\n'
-        
+
         if self.isComment:
             self.line_conv = '!' + line[1:]
         elif self.isNewComment or self.isCppLine:
@@ -102,8 +112,25 @@ class FortranLine:
         else:
             self.line_conv = self.code
 
-        if self.isLong and self.is_regular:
+        if self.excess_line != '':
             self.line_conv = self.line_conv.rstrip().ljust(72) + self.excess_line
+
+def extract_inline_comment(code):
+    """Splits line of code into (code, inline comment)"""
+    stringmode = False
+    stringchar = ""
+    
+    for column, character in enumerate(code):
+        is_string_delimiter = (character == "'" or character == '"')
+        if not stringmode and is_string_delimiter:
+            stringmode = True
+            stringchar = character
+        elif stringmode and is_string_delimiter:
+            stringmode = (character != stringchar)
+        elif not stringmode and character == "!":
+            return code[:column], code[column:]
+            
+    return code, ""
 
 
 def convertToFree(stream):
