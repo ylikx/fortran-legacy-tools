@@ -89,8 +89,8 @@ class FortranLine:
 
         self.excess_line = '' 
         if self.isLong and self.is_regular:
-            _, inline_comment = extract_inline_comment(self.code)
-            if inline_comment == "":
+            code, inline_comment = extract_inline_comment(self.code)
+            if inline_comment == "" or len(code) >= 72 - 6:
                 self.excess_line = '!' + line[72:]
                 line = line[:72] + '\n'
                 self.code = line[6:]

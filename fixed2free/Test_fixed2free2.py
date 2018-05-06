@@ -93,6 +93,20 @@ C comment inbetween                                                     WHY
      &    '!' //                                                        ABC
      &    "!'!" //
      &    "A"
+""",
+# exclamation mark after column 72
+"""
+      E = LI                                                            ABC!DEF
+""",
+# line with exactly 72 cols + newline
+"""
+      E =                                                             72
+""",
+
+# lines with ! at col 72/73
+"""
+      E = LI                                                           !Comment
+      E = 72                                                            !Comment
 """
 ]
 
@@ -180,6 +194,19 @@ C = "!" // &
     '!' // &                                                            !ABC
     "!'!" // &
     "A"
+""",
+
+"""
+E = LI                                                                  !ABC!DEF
+""",
+
+"""
+E =                                                             72
+""",
+
+"""
+E = LI                                                           !Comment
+E = 72                                                                  !!Comment
 """
 ]
 
