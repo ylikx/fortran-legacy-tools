@@ -107,6 +107,11 @@ C comment inbetween                                                     WHY
 """
       E = LI                                                           !Comment
       E = 72                                                            !Comment
+""",
+
+# inline comment after col 72
+"""
+      E = LI                                                                !Comment
 """
 ]
 
@@ -206,7 +211,11 @@ E =                                                             72
 
 """
 E = LI                                                           !Comment
-E = 72                                                                  !!Comment
+E = 72                                                                  !Comment
+""",
+
+"""
+E = LI                                                                      !Comment
 """
 ]
 

@@ -91,7 +91,7 @@ class FortranLine:
         if self.isLong and self.is_regular:
             code, inline_comment = extract_inline_comment(self.code)
             if inline_comment == "" or len(code) >= 72 - 6:
-                self.excess_line = '!' + line[72:]
+                self.excess_line = line[72:]
                 line = line[:72] + '\n'
                 self.code = line[6:]
         
@@ -113,7 +113,12 @@ class FortranLine:
             self.line_conv = self.code
 
         if self.excess_line != '':
-            self.line_conv = self.line_conv.rstrip().ljust(72) + self.excess_line
+            if self.excess_line.lstrip().startswith("!"):
+                marker = ""
+            else:
+                marker = "!"
+            
+            self.line_conv = self.line_conv.rstrip().ljust(72) + marker + self.excess_line
 
 def extract_inline_comment(code):
     """Splits line of code into (code, inline comment)"""
