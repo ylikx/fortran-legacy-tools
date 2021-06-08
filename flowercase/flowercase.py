@@ -1,7 +1,7 @@
 # flowercase.py: Conversion of Fortran code from traditional all
 #                uppercase source to more readable lowercase.
 #
-# Copyright (C) 2012    Elias Rabel
+# Copyright (C) 2012-2021    Elias Rabel
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,7 +47,6 @@ for line in infile:
   line_new = ''
   word = ''
   commentmode = False
-  stringmode = False
 
   for character in line:
     if not character.isalnum() and character != '_':
@@ -60,7 +59,7 @@ for line in infile:
       line_new += character
       word = ''
 
-      if character == '"' or character == "'" and not commentmode:
+      if (character == '"' or character == "'") and not commentmode:
         if not stringmode:
           stringchar = character
           stringmode = True
