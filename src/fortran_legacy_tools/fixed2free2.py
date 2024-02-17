@@ -113,25 +113,6 @@ class FortranLine:
 
         self.line = line
         self.__convert()
-"""
-Converts free form Fortran code to lower case without altering comments, strings, 
-or mixed case words.
-
-Usage:
-  script_name.py <file_name> 
-
-Options:
-  -h --help     Show this screen.
-  <file_name>   Input file name with free form Fortran code.
-
-Notes:
-  - This script is designed to work only with free source form. Use fixed2free.py first if you need to convert from fixed to free source form.
-  - The script lowers the case of all Fortran keywords and variables that are entirely in uppercase, while preserving the case of mixed case identifiers, strings, and comments.
-
-Example:
-  python script_name.py my_program.f90
-
-"""
 
     def __convert(self):
         line = self.line
