@@ -15,16 +15,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Converts free form Fortran code to lower case without altering comments, strings,
+or mixed case words.
 
-""" 
-Script that converts free form Fortran code to lower case
-without messing with comments or strings. Mixed case words remain
-untouched. 
+Usage:
+  flowercase <file.f90>
 
-Note: works only in free source form, use fixed2free.py first to
-convert.
+Options:
+  -h --help     Show this screen.
+  <file.f90>   Input file name with free form Fortran code.
 
-Usage: file name as first command line parameter
+Notes:
+  - This script is designed to work only with free source form. Use fixed2free.py first if you need to convert from fixed to free source form.
+  - The script lowers the case of all Fortran keywords and variables that are entirely in uppercase, while preserving the case of mixed case identifiers, strings, and comments.
+
+Example:
+  flowercase my_program.f90 > updated_program.f90
 """
 
 # author: Elias Rabel, 2012
@@ -36,45 +43,47 @@ from __future__ import print_function
 
 import sys
 
+from docopt import docopt
+
 
 def main():
+    args = docopt(__doc__)
     infile = open(sys.argv[1], "r")
 
     commentmode = False
     stringmode = False
     stringchar = ""
 
-    for line in infile:
-        line_new = ""
-        word = ""
-        commentmode = False
+    with open(args["<file.f90>"], "r") as infile:
+        for line in infile:
+            line_new = ""
+            word = ""
+            commentmode = False
 
-        for character in line:
-            if not character.isalnum() and character != "_":
-                if not stringmode and not commentmode:
-                    if word.isupper():  # means: do not convert mixed case words
-                        word = word.lower()
+            for character in line:
+                if not character.isalnum() and character != "_":
+                    if not stringmode and not commentmode:
+                        if word.isupper():  # means: do not convert mixed case words
+                            word = word.lower()
 
-                line_new += word
-                line_new += character
-                word = ""
+                    line_new += word
+                    line_new += character
+                    word = ""
 
-                if (character == '"' or character == "'") and not commentmode:
-                    if not stringmode:
-                        stringchar = character
-                        stringmode = True
-                    else:
-                        stringmode = not (character == stringchar)
+                    if (character == '"' or character == "'") and not commentmode:
+                        if not stringmode:
+                            stringchar = character
+                            stringmode = True
+                        else:
+                            stringmode = not (character == stringchar)
 
-                if character == "!" and not stringmode:
-                    commentmode = True  # treat rest of line as comment
+                    if character == "!" and not stringmode:
+                        commentmode = True  # treat rest of line as comment
 
-            else:
-                word += character
+                else:
+                    word += character
 
-        print(line_new, end="")
-
-    infile.close()
+            print(line_new, end="")
 
 
 if __name__ == "__main__":

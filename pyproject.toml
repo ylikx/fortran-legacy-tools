@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "fortran-legacy-tools"
 dynamic = ["version"]
 description = "Tools to deal with Fortran code"
+dependencies = ["docopt-ng"]
 
 [[project.authors]]
 name = "Elias Rabel"
@@ -17,14 +18,13 @@ name = "Jacob Williams"
 name = "Christopher Saloman"
 
 [project.optional-dependencies]
-development = ["wheel",  "pytest"]
+development = ["wheel", "pytest"]
 
 [project.scripts]
 fixed2free = "fortran_legacy_tools.fixed2free2:main"
 fdeclarations = "fortran_legacy_tools.fdeclarations:main"
 flowercase = "fortran_legacy_tools.flowercase:main"
 
-[tool]
 [tool.setuptools.packages.find]
 namespaces = true
 where = ["src"]

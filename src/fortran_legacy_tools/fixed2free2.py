@@ -20,22 +20,33 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Script that converts fixed form Fortran code to free form
-Usage: file name as first command line parameter
+Converts fixed form Fortran code to free form.
 
-python fixed2free2.py file.f > file.f90
+Usage:
+  fixed2free2.py <file.f>
+
+Options:
+  -h --help     Show this screen.
+  <file.f>      Input file name with fixed form Fortran code.
+
+Description:
+  This script takes a fixed form Fortran source file as input and converts
+  it to free form Fortran code. The output is printed to standard output,
+  which can be redirected to a file using '>' in the command line.
+
+Example:
+  python fixed2free2.py my_legacy_code.f > my_updated_code.f90
 """
 
 # author: Elias Rabel, 2012
 # Let me know if you find this script useful:
 # ylikx.0 at gmail
 # https://www.github.com/ylikx/
-
-# TODO:
-# *) Improve command line usage
-
 from __future__ import print_function
+
 import sys
+
+from docopt import docopt
 
 
 class FortranLine:
@@ -102,6 +113,25 @@ class FortranLine:
 
         self.line = line
         self.__convert()
+"""
+Converts free form Fortran code to lower case without altering comments, strings, 
+or mixed case words.
+
+Usage:
+  script_name.py <file_name> 
+
+Options:
+  -h --help     Show this screen.
+  <file_name>   Input file name with free form Fortran code.
+
+Notes:
+  - This script is designed to work only with free source form. Use fixed2free.py first if you need to convert from fixed to free source form.
+  - The script lowers the case of all Fortran keywords and variables that are entirely in uppercase, while preserving the case of mixed case identifiers, strings, and comments.
+
+Example:
+  python script_name.py my_program.f90
+
+"""
 
     def __convert(self):
         line = self.line
@@ -167,14 +197,11 @@ def convertToFree(stream):
 
 
 def main():
-    if len(sys.argv) > 1:
-        infile = open(sys.argv[1], "r")
-        for line in convertToFree(infile):
-            print(line, end="")
+    args = docopt(__doc__)
 
-        infile.close()
-    else:
-        print(__doc__)
+    with open(args["<file.f>"], "r") as f:
+        for line in convertToFree(f):
+            print(line, end="")
 
 
 if __name__ == "__main__":

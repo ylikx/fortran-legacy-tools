@@ -17,53 +17,48 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 """
-Tool to separate subroutine arguments from declarations of local variables.
+Separates subroutine arguments from declarations of local variables and
+converts to the Fortran 90 declaration style.
 
-Legacy Fortran subroutines often have huge argument lists. Fortran allows
-mixing of argument datatype declarations and declarations of local variables, 
-which can lead to confusion.
+Usage:
+  fdeclarations.py <file.f90>
 
-This tool generates code for a wrapper of the given subroutine, which
-separates declarations into 3 sections:
--) parameters (might be needed for dimensions of array arguments)
--) subroutine arguments
--) local variables (commented out)
-
-Furthermore a conversion to the Fortran 90 declaration style is performed.
-
-Usage: python fdeclarations.py file.f90 > output.f90
+Options:
+  -h --help     Show this screen.
+  <file.f90>    Input Fortran 90 file name containing the subroutine.
 
 Restrictions:
+  - Assumes free source format.
+  - Assumes 'implicit none'.
+  - Only one subroutine per file allowed.
+  - There might be problems when working with Fortran functions. Workaround: replace 'function' keyword temporarily with 'subroutine'.
+  - Warning: does not deal with attributes in different lines (e.g., double complex :: CONE, parameter (CONE = (1.0d0, 0.0d0))).
+  - Does not deal with constructs like real * 8 or real (8) in F77 declaration style if not written without spaces.
 
-*) Assumes free source format
-*) Assumes 'implicit none'
-*) Only one subroutine per file allowed
+Description:
+  This tool generates code for a wrapper of the given subroutine, which
+  separates declarations into three sections: parameters (for dimensions of array arguments),
+  subroutine arguments, and local variables (commented out). Additionally,
+  it converts declarations to the Fortran 90 style. The result is printed to
+  standard output, which can be redirected to a file.
 
-*) There might be problems when working with Fortran functions
-Workaround: replace 'function' keyword temporarily with 'subroutine'
-
-*) Warning: does not deal with attributes in different lines:
-*) e.g.:
-*) double complex :: CONE
-*) parameter (CONE = (1.0d0, 0.0d0))
-
-*) does not deal with constructs like real * 8 or real (8) 
-*) in F77 declaration style if not written without spaces
-
-
-author: Elias Rabel
-Let me know when you find this script useful:
-ylikx.0 at gmail
-https://www.github.com/ylikx/
-
+Example:
+  python fdeclarations.py my_subroutine.f90 > updated_subroutine.f90
 """
+
+#  author: Elias Rabel
+#  Let me know when you find this script useful:
+#  ylikx.0 at gmail
+#  https://www.github.com/ylikx/
+
 
 from __future__ import print_function
 
 import re
 import sys
+
+from docopt import docopt
 
 TYPEKEYS = [
     "integer",
@@ -349,48 +344,47 @@ def printWrapperCode(subname, arglist, varlist):
 
 
 def main():
-    f = open(sys.argv[1], "r")
+    args = docopt(__doc__)
 
-    xf = gen_removeEmptyLines(gen_removeLineContinuations(gen_removeComments(f)))
+    with open(args["<file.f90>"], "r") as f:
+        xf = gen_removeEmptyLines(gen_removeLineContinuations(gen_removeComments(f)))
 
-    class NoArgList:
-        pass
+        class NoArgList:
+            pass
 
-    # get argument list first:
-    args = None
+        # get argument list first:
+        args = None
 
-    for line in xf:
-        temp = getArgumentList(line)
-        if temp != None:
-            subname, args = temp
-            break
+        for line in xf:
+            temp = getArgumentList(line)
+            if temp is not None:
+                subname, args = temp
+                break
 
-    if not args:
-        print("ERROR: no subroutine header found!")
-        raise NoArgList
+        if not args:
+            print("ERROR: no subroutine header found!")
+            raise NoArgList
 
-    vardict = {}
-    varlist = []
+        vardict = {}
+        varlist = []
 
-    for line in xf:
-        if isDeclarationLine(line):
-            decl, names, dims, initstr = getVariablenames(line)
-            # print getVariablenames(line)
-            for name, dim in zip(names, dims):
-                entry = FortranVariable(name, decl, dim, initstr, is_argument=False)
-                vardict[name.lower()] = entry
-                varlist.append(entry)
+        for line in xf:
+            if isDeclarationLine(line):
+                decl, names, dims, initstr = getVariablenames(line)
+                # print getVariablenames(line)
+                for name, dim in zip(names, dims):
+                    entry = FortranVariable(name, decl, dim, initstr, is_argument=False)
+                    vardict[name.lower()] = entry
+                    varlist.append(entry)
 
-        if "end subroutine" in line:
-            break
+            if "end subroutine" in line:
+                break
 
-    # print varlist
+        # print varlist
 
-    # Flag arguments
-    for arg in args:
-        vardict[arg.lower()].is_argument = True
-
-    f.close()
+        # Flag arguments
+        for arg in args:
+            vardict[arg.lower()].is_argument = True
 
     printWrapperCode(subname, args, varlist)
 
