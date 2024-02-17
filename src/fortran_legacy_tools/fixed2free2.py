@@ -158,8 +158,7 @@ def convertToFree(stream):
         yield str(l)
         
 
-if __name__ == "__main__":
-
+def main():
     if len(sys.argv) > 1:
         infile = open(sys.argv[1], 'r')
         for line in convertToFree(infile):
@@ -168,3 +167,7 @@ if __name__ == "__main__":
         infile.close()
     else:
         print(__doc__)
+    
+
+if __name__ == '__main__':
+    main()

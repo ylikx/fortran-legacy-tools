@@ -36,42 +36,46 @@ from __future__ import print_function
 
 import sys
 
-infile = open(sys.argv[1], 'r')
 
-commentmode = False
-stringmode = False
-stringchar = ''
+def main():
+    infile = open(sys.argv[1], "r")
+
+    commentmode = False
+    stringmode = False
+    stringchar = ""
+
+    for line in infile:
+        line_new = ""
+        word = ""
+        commentmode = False
+
+        for character in line:
+            if not character.isalnum() and character != "_":
+                if not stringmode and not commentmode:
+                    if word.isupper():  # means: do not convert mixed case words
+                        word = word.lower()
+
+                line_new += word
+                line_new += character
+                word = ""
+
+                if (character == '"' or character == "'") and not commentmode:
+                    if not stringmode:
+                        stringchar = character
+                        stringmode = True
+                    else:
+                        stringmode = not (character == stringchar)
+
+                if character == "!" and not stringmode:
+                    commentmode = True  # treat rest of line as comment
+
+            else:
+                word += character
+
+        print(line_new, end="")
+
+    infile.close()
 
 
-for line in infile:
-  line_new = ''
-  word = ''
-  commentmode = False
-
-  for character in line:
-    if not character.isalnum() and character != '_':
-
-      if not stringmode and not commentmode:
-        if word.isupper(): # means: do not convert mixed case words
-          word = word.lower()
-
-      line_new += word
-      line_new += character
-      word = ''
-
-      if (character == '"' or character == "'") and not commentmode:
-        if not stringmode:
-          stringchar = character
-          stringmode = True
-        else:
-          stringmode = not (character == stringchar)
-
-      if character == '!' and not stringmode:
-        commentmode = True # treat rest of line as comment
-
-    else:
-      word += character
-
-  print(line_new, end="")
-
-infile.close()
+if __name__ == "__main__":
+    main()

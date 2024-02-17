@@ -330,7 +330,7 @@ def printWrapperCode(subname, arglist, varlist):
     print()
     print("end subroutine")
 
-if __name__ == "__main__":
+def main():
 
     f = open(sys.argv[1], 'r')
 
@@ -378,3 +378,6 @@ if __name__ == "__main__":
 
     printWrapperCode(subname, args, varlist)
 
+
+if __name__ == '__main__':
+    main()
