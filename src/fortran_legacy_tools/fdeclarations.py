@@ -349,9 +349,6 @@ def main():
     with open(args["<file.f90>"], "r") as f:
         xf = gen_removeEmptyLines(gen_removeLineContinuations(gen_removeComments(f)))
 
-        class NoArgList:
-            pass
-
         # get argument list first:
         args = None
 
@@ -362,8 +359,7 @@ def main():
                 break
 
         if not args:
-            print("ERROR: no subroutine header found!")
-            raise NoArgList
+            raise NoArgList("ERROR: no subroutine header found!")
 
         vardict = {}
         varlist = []
@@ -388,6 +384,9 @@ def main():
 
     printWrapperCode(subname, args, varlist)
 
+
+class NoArgList(Exception):
+    pass
 
 if __name__ == "__main__":
     main()
